@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
-	"name": "Youtube Blocker",
-	"description": "Блокировать карточки с видио на youtube по ключевыи словам",
+	"name": "Youtube Video Blocker",
+	"description": "Блокировать карточки с видeо на youtube по ключевым словам",
 	"version": "1.0.0",
 	"browser_action": {
 		"default_icon": "icon.svg",
