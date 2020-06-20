@@ -1,14 +1,18 @@
 
 export class Storage {
+    private storage: typeof chrome.storage | undefined = chrome.storage;
     constructor() {
-        chrome.storage.onChanged.addListener((e) => {
+        this.storage?.onChanged.addListener((e) => {
             this.subsTrigger(e);
         });
     }
 
     public getKeywordList(): Promise<string[]> {
         return new Promise((resolve) => {
-            chrome.storage.local.get(['blocker_keyword_list'], (result) => {
+            if (!this.storage) {
+                resolve([]);
+            }
+            this.storage?.local.get(['blocker_keyword_list'], (result) => {
                 const list: string[] = result.blocker_keyword_list || [];
                 resolve(list.map((k) => k.trim()));
             });
@@ -25,10 +29,10 @@ export class Storage {
                 resolve();
                 return;
             }
-            chrome.storage.local.get(['blocker_keyword_list'], (result) => {
+            this.storage?.local.get(['blocker_keyword_list'], (result) => {
                 const list = result.blocker_keyword_list || [];
                 list.push(keyword.toLowerCase().trim());
-                chrome.storage.local.set({blocker_keyword_list: [...new Set(list)]}, () => {
+                this.storage?.local.set({blocker_keyword_list: [...new Set(list)]}, () => {
                     resolve();
             });
             });
@@ -37,7 +41,10 @@ export class Storage {
 
     public getCounter(): Promise<number> {
         return new Promise((resolve) => {
-            chrome.storage.local.get(["blocker_counter"], (result) => {
+            if (!this.storage) {
+                resolve(0);
+            }
+            this.storage?.local.get(["blocker_counter"], (result) => {
                 const counter = parseInt(result.blocker_counter || 0, 10)
                 resolve(counter);
             });
@@ -46,7 +53,7 @@ export class Storage {
 
     public setCounter(counter: number) {
         return new Promise((resolve) => {
-            chrome.storage.local.set({blocker_counter: counter}, () => {
+            this.storage?.local.set({blocker_counter: counter}, () => {
                 resolve();
             });
         });
@@ -56,7 +63,7 @@ export class Storage {
         return new Promise((resolve) => {
             this.getKeywordList().then((list) => {
                 const newList = list.filter((k) => k !== keyword.toLowerCase());
-                chrome.storage.local.set({blocker_keyword_list: newList}, () => {
+                this.storage?.local.set({blocker_keyword_list: newList}, () => {
                     resolve();
             })
             });

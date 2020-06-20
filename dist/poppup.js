@@ -28702,14 +28702,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Storage = void 0;
 class Storage {
     constructor() {
+        var _a;
+        this.storage = chrome.storage;
         this.subs = new Set();
-        chrome.storage.onChanged.addListener((e) => {
+        (_a = this.storage) === null || _a === void 0 ? void 0 : _a.onChanged.addListener((e) => {
             this.subsTrigger(e);
         });
     }
     getKeywordList() {
         return new Promise((resolve) => {
-            chrome.storage.local.get(['blocker_keyword_list'], (result) => {
+            var _a;
+            if (!this.storage) {
+                resolve([]);
+            }
+            (_a = this.storage) === null || _a === void 0 ? void 0 : _a.local.get(['blocker_keyword_list'], (result) => {
                 const list = result.blocker_keyword_list || [];
                 resolve(list.map((k) => k.trim()));
             });
@@ -28717,6 +28723,7 @@ class Storage {
     }
     addKeyWord(keyword) {
         return new Promise((resolve) => {
+            var _a;
             if (keyword.trim() === "") {
                 resolve();
                 return;
@@ -28725,10 +28732,11 @@ class Storage {
                 resolve();
                 return;
             }
-            chrome.storage.local.get(['blocker_keyword_list'], (result) => {
+            (_a = this.storage) === null || _a === void 0 ? void 0 : _a.local.get(['blocker_keyword_list'], (result) => {
+                var _a;
                 const list = result.blocker_keyword_list || [];
                 list.push(keyword.toLowerCase().trim());
-                chrome.storage.local.set({ blocker_keyword_list: [...new Set(list)] }, () => {
+                (_a = this.storage) === null || _a === void 0 ? void 0 : _a.local.set({ blocker_keyword_list: [...new Set(list)] }, () => {
                     resolve();
                 });
             });
@@ -28736,7 +28744,11 @@ class Storage {
     }
     getCounter() {
         return new Promise((resolve) => {
-            chrome.storage.local.get(["blocker_counter"], (result) => {
+            var _a;
+            if (!this.storage) {
+                resolve(0);
+            }
+            (_a = this.storage) === null || _a === void 0 ? void 0 : _a.local.get(["blocker_counter"], (result) => {
                 const counter = parseInt(result.blocker_counter || 0, 10);
                 resolve(counter);
             });
@@ -28744,7 +28756,8 @@ class Storage {
     }
     setCounter(counter) {
         return new Promise((resolve) => {
-            chrome.storage.local.set({ blocker_counter: counter }, () => {
+            var _a;
+            (_a = this.storage) === null || _a === void 0 ? void 0 : _a.local.set({ blocker_counter: counter }, () => {
                 resolve();
             });
         });
@@ -28752,8 +28765,9 @@ class Storage {
     removeKeyWord(keyword) {
         return new Promise((resolve) => {
             this.getKeywordList().then((list) => {
+                var _a;
                 const newList = list.filter((k) => k !== keyword.toLowerCase());
-                chrome.storage.local.set({ blocker_keyword_list: newList }, () => {
+                (_a = this.storage) === null || _a === void 0 ? void 0 : _a.local.set({ blocker_keyword_list: newList }, () => {
                     resolve();
                 });
             });
